@@ -28,6 +28,7 @@ def main():
     a1 = di.locate(A)
     a2 = di.locate(A)
     assert(a1 != a2) # the 2 A objects are different
+    assert(a1 not in all_A)  # the A instance from all_A is not the same as the one found by locate
 
     response = di.locate(HelloResponse, ["Hello"])
     assert(response is not None) # HelloResponse located
