@@ -12,11 +12,22 @@ def main():
     di.register(B)
     di.register(C)
 
+    # locate_all test
     all_A = di.locate_all(A)
     assert(len(all_A) == 4) # Includes A, B, C, and D
 
     all_B = di.locate_all(B)
     assert(len(all_B) == 2) # Includes B and C
+
+    # register_instance test
+    d1 = di.locate(D)
+    d2 = di.locate(D)
+    assert(d1 == d2) # the D instances are the same
+    assert(d1 in all_A)  # the D instance from all_A is the same as the one found by locate
+
+    a1 = di.locate(A)
+    a2 = di.locate(A)
+    assert(a1 != a2) # the 2 A objects are different
 
     response = di.locate(HelloResponse, ["Hello"])
     assert(response is not None) # HelloResponse located
