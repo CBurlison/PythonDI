@@ -40,7 +40,7 @@ def main():
     print("All tests pass!")
 
 class TestResponse:
-    def __init__(self, test: int, body: str = ""):
+    def __init__(self, test: int, body: str):
         self.test = test
         self.body = body
 
