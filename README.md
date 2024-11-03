@@ -3,8 +3,17 @@ A simple DI Container script for python
 
 This DI container comes with 4 simple functions to facilitate the Dependency Injection workflow. In order PythonDI to work all registered objects must have __init__ functions with strongly defined types. The only exception to this is if "register_instance" is being used and the instance of that object is included.
 
-### DIContainer(default_if_unregistered: bool = True)
-when default_if_unregistered is True, __init__ values that are not registered will be initialized with their default values of type(). When false they will be set to None.
+### DIContainer(unregistered_action: UnregisteredAction = UnregisteredAction.DEFAULT)
+Actions when encountering an unregistered type can now be defined to act more broadly.
+
+1. UnregisteredAction.DEFAULT
+    - The type will be instantiated with all default values. **Note:** Any values without a default, thus would be required, will raise an error.
+2. UnregisteredAction.NONE
+    - The value will be set to None
+3. UnregisteredAction.EXCEPTION
+    - An UnregisteredType error will be raised.   
+4. UnregisteredAction.REGISTER
+    - The unregistered type will be registered and located.
 
 ## Functions
 ### register(object_type: type)
