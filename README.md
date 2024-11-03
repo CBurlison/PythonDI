@@ -60,4 +60,27 @@ def test_locate_all():
     all_B = di.locate_all(B)
     assert len(all_B) == 2 # Includes B and C
     assert d not in all_B
+
+# test classes
+class OtherResponse:
+    def __init__(self, test: int, body: str):
+        self.test = test
+        self.body = body
+
+class GoodbyeResponse:
+    def __init__(self, test: OtherResponse = None):
+        self.test = test
+
+class HelloResponse:
+    def __init__(self, body: str, goodbye: GoodbyeResponse):
+        self.body = body
+        self.goodbye = goodbye
+
+class A: pass
+
+class B(A): pass
+
+class C(B): pass
+
+class D(A): pass
 ```
