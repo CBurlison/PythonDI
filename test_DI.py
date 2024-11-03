@@ -12,8 +12,17 @@ def test_locate():
     response = di.locate(HelloResponse, [])
     assert response is not None # HelloResponse located
     assert response.body == "" # body populated with default value for str
-    assert response.goodbye is not None # GoodbyeResponse not located. default value used
+    assert response.goodbye is not None # GoodbyeResponse not registered. default value used
     assert response.goodbye.test is None # TestResponse not located because GoodbyeResponse was default. test never populated
+
+def test_locate_unregistered_none():
+    di = DIContainer(False)
+    di.register(HelloResponse)
+
+    response = di.locate(HelloResponse, [])
+    assert response is not None # HelloResponse located
+    assert response.body is None # str not registered. value is None
+    assert response.goodbye is None # GoodbyeResponse not registered. value is None
 
 def test_locate_dependencies():
     di = DIContainer()

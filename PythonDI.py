@@ -13,8 +13,12 @@ class TypeConstructor:
         self.keys = [key for key in constructor.keys()]
 
 class DIContainer:
+    __default_if_unregistered: bool = True
     __type_constructors: dict[type, TypeConstructor] = {}
     __type_instances: dict[type, any] = {}
+
+    def __init__(self, default_if_unregistered: bool = True):
+        self.__default_if_unregistered = default_if_unregistered
 
     # register an object type for future construction
     def register(self, object_type: type):
@@ -54,7 +58,10 @@ class DIContainer:
     # private: construct a new object
     def __inner_locate(self, object_type: type, params=[]) -> any:
         if object_type not in self.__type_constructors:
-            return object_type()
+            if self.__default_if_unregistered:
+                return object_type()
+            else:
+                return None
         
         args: list[any] = []
         di_constructor = self.__type_constructors[object_type]
