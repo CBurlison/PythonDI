@@ -88,9 +88,9 @@ class D(A): pass
 ## Performance
 To those whom it may concern, I have added performance tests which compare running DI vs manual instantiation. The previous results when run on my system were:
 
-'''
+```
 Results
 Test                    Runtime (sec)
 DI test                 214.65
 Manual test             70.44
-'''
+```
