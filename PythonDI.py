@@ -10,12 +10,7 @@ class TypeConstructor:
         self.base_type = object_type
         self.classes = inspect.getmro(object_type)
         self.constructor = constructor
-        
-        new_list: list[str] = []
-        for key in constructor.keys():
-            new_list.append(key)
-
-        self.keys = new_list
+        self.keys = [key for key in constructor.keys()]
 
 class DIContainer:
     __type_constructors: dict[type, TypeConstructor] = {}
