@@ -36,6 +36,14 @@ def test_locate_dependencies():
     assert response.goodbye.test.test == 0 # TestResponse.test populated with default value for int
     assert response.goodbye.test.body == "" # TestResponse.body populated with default value for str
     
+def test_locate_with_param():
+    di = DIContainer()
+    di.register(HelloResponse)
+
+    response = di.locate(HelloResponse, ["Hello"])
+    assert response is not None # HelloResponse located
+    assert response.body == "Hello" # body param applies
+
 def test_locate_all():
     di = DIContainer()
     di.register(A)
