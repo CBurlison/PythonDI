@@ -1,4 +1,4 @@
-from PythonDI import DIContainer
+from PythonDI import *
 import pytest
 
 def test_register():
@@ -16,13 +16,36 @@ def test_locate():
     assert response.goodbye.test is None # TestResponse not located because GoodbyeResponse was default. test never populated
 
 def test_locate_unregistered_none():
-    di = DIContainer(False)
+    di = DIContainer(UnregisteredAction.NONE)
     di.register(HelloResponse)
 
     response = di.locate(HelloResponse, [])
     assert response is not None # HelloResponse located
     assert response.body is None # str not registered. value is None
     assert response.goodbye is None # GoodbyeResponse not registered. value is None
+
+def test_locate_unregistered_exception():
+    di = DIContainer(UnregisteredAction.EXCEPTION)
+    di.register(HelloResponse)
+
+    with pytest.raises(UnregisteredType) as ex:
+        _ = di.locate(HelloResponse, [])
+
+    assert ex.value.args[0] == f"{str} not registered with DIContainer."
+
+def test_locate_unregistered_register():
+    di = DIContainer(UnregisteredAction.REGISTER)
+    di.register(HelloResponse)
+
+    _ = di.locate(HelloResponse, [])
+
+    response = di.locate(HelloResponse, [])
+    assert response is not None # HelloResponse located
+    assert response.body == "" # body populated with default value for str
+    assert response.goodbye is not None # GoodbyeResponse located
+    assert response.goodbye.test is not None # TestResponse located
+    assert response.goodbye.test.test == 0 # TestResponse.test populated with default value for int
+    assert response.goodbye.test.body == "" # TestResponse.body populated with default value for str
 
 def test_locate_dependencies():
     di = DIContainer()

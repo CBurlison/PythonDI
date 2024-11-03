@@ -1,4 +1,11 @@
 import inspect
+from enum import Enum
+
+class UnregisteredAction(Enum):
+    NONE = 0
+    DEFAULT = 1
+    EXCEPTION = 2
+    REGISTER = 3
 
 class TypeConstructor:
     base_type: type = None
@@ -12,17 +19,31 @@ class TypeConstructor:
         self.constructor = constructor
         self.keys = [key for key in constructor.keys()]
 
+class UnregisteredType(Exception): pass
+
 class DIContainer:
-    __default_if_unregistered: bool = True
     __type_constructors: dict[type, TypeConstructor] = {}
     __type_instances: dict[type, any] = {}
 
-    def __init__(self, default_if_unregistered: bool = True):
-        self.__default_if_unregistered = default_if_unregistered
+    def __init__(self, unregistered_action: UnregisteredAction = UnregisteredAction.DEFAULT):
+        match unregistered_action:
+            case UnregisteredAction.DEFAULT:
+                self.__unregistered_action = self.__unregistered_default
+            case UnregisteredAction.NONE:
+                self.__unregistered_action = self.__unregistered_none
+            case UnregisteredAction.EXCEPTION:
+                self.__unregistered_action = self.__unregistered_exception
+            case UnregisteredAction.REGISTER:
+                self.__unregistered_action = self.__unregistered_register
 
     # register an object type for future construction
     def register(self, object_type: type):
-        constructor = inspect.getfullargspec(object_type).annotations
+        constructor: dict[str, any]
+        try:
+            constructor = inspect.getfullargspec(object_type).annotations
+        except(TypeError):
+            constructor = {}
+
         self.__type_constructors[object_type] = TypeConstructor(object_type, constructor)
         
     # register an object type instance
@@ -58,11 +79,8 @@ class DIContainer:
     # private: construct a new object
     def __inner_locate(self, object_type: type, params=[]) -> any:
         if object_type not in self.__type_constructors:
-            if self.__default_if_unregistered:
-                return object_type()
-            else:
-                return None
-        
+            return self.__unregistered_action(object_type, params)
+               
         args: list[any] = []
         di_constructor = self.__type_constructors[object_type]
         params_len = len(params)
@@ -76,3 +94,15 @@ class DIContainer:
 
         return object_type(*args)
     
+    def __unregistered_default(self, object_type: type, params: list[any]):
+        return object_type()
+    
+    def __unregistered_none(self, object_type: type, params: list[any]):
+        return None
+    
+    def __unregistered_exception(self, object_type: type, params: list[any]):
+        raise UnregisteredType(f"{object_type} not registered with DIContainer.")
+    
+    def __unregistered_register(self, object_type: type, params: list[any]):
+        self.register(object_type)
+        return self.__inner_locate(object_type, params)
