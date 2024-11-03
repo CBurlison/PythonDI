@@ -26,14 +26,14 @@ class DIContainer:
     __type_instances: dict[type, any] = {}
 
     def __init__(self, unregistered_action: UnregisteredAction = UnregisteredAction.DEFAULT):
-        match unregistered_action:
-            case UnregisteredAction.DEFAULT:
+        match unregistered_action.value:
+            case UnregisteredAction.DEFAULT.value:
                 self.__unregistered_action = self.__unregistered_default
-            case UnregisteredAction.NONE:
+            case UnregisteredAction.NONE.value:
                 self.__unregistered_action = self.__unregistered_none
-            case UnregisteredAction.EXCEPTION:
+            case UnregisteredAction.EXCEPTION.value:
                 self.__unregistered_action = self.__unregistered_exception
-            case UnregisteredAction.REGISTER:
+            case UnregisteredAction.REGISTER.value:
                 self.__unregistered_action = self.__unregistered_register
 
     # register an object type for future construction
