@@ -111,6 +111,14 @@ def test_locate_with_param():
     assert response is not None # HelloResponse located
     assert response.body == "Hello" # body param applies
 
+def test_locate_with_param_pydantic():
+    di = DIContainer()
+    di.register(PydanticHelloResponse)
+
+    response = di.locate(PydanticHelloResponse, ["Hello"])
+    assert response is not None # HelloResponse located
+    assert response.body == "Hello" # body param applies
+
 def test_register_instance():
     di = DIContainer()
     di.register_instance(B, B())

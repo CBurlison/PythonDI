@@ -27,6 +27,10 @@ def perf_test_manual():
     for _ in range(execution_count):
         _ = HelloResponse(body="Hello", goodbye=GoodbyeResponse(test=OtherResponse(test=0, body="")))
 
+def perf_test_manual_pydantic():
+    for _ in range(execution_count):
+        _ = PydanticHelloResponse(body="Hello", goodbye=PydanticGoodbyeResponse(test=PydanticOtherResponse(test=0, body="")))
+
 def main():
     print("Running performance tests.")
     print("Now running: DI test")
@@ -35,11 +39,14 @@ def main():
     pydantic_di = timeit.timeit(stmt=perf_test_di_pydantic, number=1)
     print("Now running: Manual test")
     manual = timeit.timeit(stmt=perf_test_manual, number=1)
+    print("Now running: Pydantic Manual test")
+    pydantic_manual = timeit.timeit(stmt=perf_test_manual_pydantic, number=1)
 
     print("\nResults\nTest\t\t\tRuntime (sec)")
     print(f"DI test\t\t\t{di:.2f}")
     print(f"Pydantic DI test\t{pydantic_di:.2f}")
     print(f"Manual test\t\t{manual:.2f}")
+    print(f"Pydantic Manual test\t{pydantic_manual:.2f}")
 
 class OtherResponse:
     def __init__(self, test: int, body: str):

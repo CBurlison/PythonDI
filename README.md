@@ -102,7 +102,8 @@ To those whom it may concern, I have added performance tests which compare runni
 ```
 Results
 Test                    Runtime (sec)
-DI test                 22.35
-Pydantic DI test        141.63
-Manual test             6.78
+DI test                 22.77
+Pydantic DI test        143.78
+Manual test             6.95
+Pydantic Manual test    26.67
 ```
