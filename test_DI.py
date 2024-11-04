@@ -1,5 +1,6 @@
 from PythonDI import *
 import pytest
+from pydantic import BaseModel
 
 def test_register():
     di = DIContainer()
@@ -60,6 +61,47 @@ def test_locate_dependencies():
     assert response.goodbye.test is not None # TestResponse located
     assert response.goodbye.test.test == 0 # TestResponse.test populated with default value for int
     assert response.goodbye.test.body == "" # TestResponse.body populated with default value for str
+
+def test_locate_pydantic_dependencies():
+    di = DIContainer()
+    di.register(PydanticOtherResponse)
+    di.register(PydanticGoodbyeResponse)
+    di.register(PydanticHelloResponse)
+
+    response = di.locate(PydanticHelloResponse, [])
+    assert response is not None # HelloResponse located
+    assert response.body == "" # body populated with default value for str
+    assert response.goodbye is not None # GoodbyeResponse located
+    assert response.goodbye.test is not None # TestResponse located
+    assert response.goodbye.test.test == 0 # TestResponse.test populated with default value for int
+    assert response.goodbye.test.body == "" # TestResponse.body populated with default value for str
+
+def test_locate_dependencies_mixed():
+    di = DIContainer()
+    di.register(OtherResponse)
+    di.register(GoodbyeResponse)
+    di.register(HelloResponse)
+    di.register(PydanticOtherResponse)
+    di.register(PydanticGoodbyeResponse)
+    di.register(PydanticHelloResponse)
+    di.register(MixedResponse)
+
+    response: MixedResponse = di.locate(MixedResponse, [])
+    assert response is not None # HelloResponse located
+    assert response.hello is not None
+    assert response.hello.body == "" # body populated with default value for str
+    assert response.hello.goodbye is not None # GoodbyeResponse located
+    assert response.hello.goodbye.test is not None # TestResponse located
+    assert response.hello.goodbye.test.test == 0 # TestResponse.test populated with default value for int
+    assert response.hello.goodbye.test.body == "" # TestResponse.body populated with default value for str
+    
+    assert response.py_hello is not None
+    assert response.py_hello is not None
+    assert response.py_hello.body == "" # body populated with default value for str
+    assert response.py_hello.goodbye is not None # GoodbyeResponse located
+    assert response.py_hello.goodbye.test is not None # TestResponse located
+    assert response.py_hello.goodbye.test.test == 0 # TestResponse.test populated with default value for int
+    assert response.py_hello.goodbye.test.body == "" # TestResponse.body populated with default value for str
 
 def test_locate_with_param():
     di = DIContainer()
@@ -123,7 +165,23 @@ class HelloResponse:
     def __init__(self, body: str, goodbye: GoodbyeResponse):
         self.body = body
         self.goodbye = goodbye
+  
+class PydanticOtherResponse(BaseModel):
+    test: int = 0
+    body: str = ""
 
+class PydanticGoodbyeResponse(BaseModel):
+    test: PydanticOtherResponse = None
+
+class PydanticHelloResponse(BaseModel):
+    body: str = ""
+    goodbye: PydanticGoodbyeResponse = None
+
+class MixedResponse:
+    def __init__(self, hello: HelloResponse = None, py_hello: PydanticHelloResponse = None):
+        self.hello = hello
+        self.py_hello = py_hello
+        
 class A: pass
 
 class B(A): pass

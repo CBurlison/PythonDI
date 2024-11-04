@@ -1,5 +1,6 @@
 import inspect
 from enum import Enum
+from pydantic import BaseModel
 
 class UnregisteredAction(Enum):
     NONE = 0
@@ -12,10 +13,16 @@ class TypeConstructor:
     constructor: dict[str, type] = None
     keys: list[str] = None
     classes: tuple[type, ...] = None
+    is_pydantic: bool = False
     
     def __init__(self, object_type: type, constructor: dict[str, type]):
         self.base_type = object_type
         self.classes = inspect.getmro(object_type)
+
+        if BaseModel in self.classes and "return" in constructor:
+            self.is_pydantic = True
+            constructor.pop("return")
+
         self.constructor = constructor
         self.keys = [key for key in constructor.keys()]
 
@@ -80,8 +87,15 @@ class DIContainer:
         if object_type not in self.__type_constructors:
             return self.__unregistered_action(object_type, params)
                
-        args: list[any] = []
         di_constructor = self.__type_constructors[object_type]
+        
+        if di_constructor.is_pydantic:
+            return self.__construct_base_model(di_constructor, object_type, params)
+        
+        return self.__construct_type(di_constructor, object_type, params)
+    
+    def __construct_type(self, di_constructor: TypeConstructor, object_type: type, params=[]):
+        args: list[any] = []
         params_len = len(params)
 
         for i in range(len(di_constructor.constructor)):
@@ -92,6 +106,20 @@ class DIContainer:
                 args.append(self.locate(di_constructor.constructor[key]))
 
         return object_type(*args)
+    
+    def __construct_base_model(self, di_constructor: TypeConstructor, object_type: type, params=[]):
+        obj: object = object_type()
+        params_len = len(params)
+
+        for i in range(len(di_constructor.constructor)):
+            key = di_constructor.keys[i]
+
+            if (i < params_len):
+                setattr(obj, key, params[i])
+            else:
+                setattr(obj, key, self.locate(di_constructor.constructor[key]))
+
+        return obj
     
     def __unregistered_default(self, object_type: type, params: list[any]):
         return object_type()

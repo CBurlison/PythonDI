@@ -3,6 +3,8 @@ A simple DI Container script for python
 
 This DI container comes with 4 simple functions to facilitate the Dependency Injection workflow. In order PythonDI to work all registered objects must have __init__ functions with strongly defined types. The only exception to this is if "register_instance" is being used and the instance of that object is included.
 
+Pydantic objects are now supported, but currently their construction is very slow. See Performance below for details.
+
 ### DIContainer(unregistered_action: UnregisteredAction = UnregisteredAction.DEFAULT)
 Actions when encountering an unregistered type can now be defined to act more broadly.
 
@@ -95,11 +97,12 @@ class D(A): pass
 ```
 
 ## Performance
-To those whom it may concern, I have added performance tests which compare running DI vs manual instantiation. The previous results when run on my system were:
+To those whom it may concern, I have added performance tests which compare running DI vs manual instantiation. The previous results when running each case 10M times on my system were:
 
 ```
 Results
 Test                    Runtime (sec)
-DI test                 214.65
-Manual test             70.44
+DI test                 22.35
+Pydantic DI test        141.63
+Manual test             6.78
 ```
