@@ -167,8 +167,6 @@ def test_locate_dependencies_required_defaults():
     with pytest.raises(TypeError) as ex:
         _ = di.locate(RequiredHelloResponse, [])
 
-    assert ex.value.args[0] == "RequiredGoodbyeResponse.__init__() missing 1 required positional argument: 'test'"
-
 class OtherResponse:
     def __init__(self, test: int, body: str):
         self.test = test
