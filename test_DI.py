@@ -160,6 +160,15 @@ def test_locate_all():
     assert len(all_B) == 2 # Includes B and C
     assert d not in all_B
 
+def test_locate_dependencies_required_defaults():
+    di = DIContainer()
+    di.register(RequiredHelloResponse)
+
+    with pytest.raises(TypeError) as ex:
+        _ = di.locate(RequiredHelloResponse, [])
+
+    assert ex.value.args[0] == "RequiredGoodbyeResponse.__init__() missing 1 required positional argument: 'test'"
+
 class OtherResponse:
     def __init__(self, test: int, body: str):
         self.test = test
@@ -190,6 +199,15 @@ class MixedResponse:
         self.hello = hello
         self.py_hello = py_hello
         
+class RequiredGoodbyeResponse:
+    def __init__(self, test: OtherResponse):
+        self.test = test
+
+class RequiredHelloResponse:
+    def __init__(self, body: str, goodbye: RequiredGoodbyeResponse):
+        self.body = body
+        self.goodbye = goodbye
+  
 class A: pass
 
 class B(A): pass

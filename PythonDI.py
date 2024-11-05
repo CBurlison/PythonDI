@@ -24,7 +24,7 @@ class TypeConstructor:
             constructor.pop("return")
 
         self.constructor = constructor
-        self.keys = [key for key in constructor.keys()]
+        self.keys = list(constructor.keys())
 
 class UnregisteredType(Exception): pass
 
@@ -108,7 +108,7 @@ class DIContainer:
         return object_type(*args)
     
     def __construct_base_model(self, di_constructor: TypeConstructor, object_type: type, params=[]):
-        obj: object = object_type()
+        obj = object_type()
         params_len = len(params)
 
         for i in range(len(di_constructor.constructor)):

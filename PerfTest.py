@@ -10,7 +10,7 @@ def perf_test_di():
     di.register(OtherResponse)
     di.register(GoodbyeResponse)
     di.register(HelloResponse)
-
+    
     for _ in range(execution_count):
         _ = di.locate(HelloResponse, ["Hello"])
 
@@ -42,11 +42,14 @@ def main():
     print("Now running: Pydantic Manual test")
     pydantic_manual = timeit.timeit(stmt=perf_test_manual_pydantic, number=1)
 
-    print("\nResults\nTest\t\t\tRuntime (sec)")
-    print(f"DI test\t\t\t{di:.2f}")
-    print(f"Pydantic DI test\t{pydantic_di:.2f}")
-    print(f"Manual test\t\t{manual:.2f}")
-    print(f"Pydantic Manual test\t{pydantic_manual:.2f}")
+    print("\nResults\nTest\t\t\tRuntime (sec)\tAverage (μs)")
+    print(f"DI test\t\t\t{di:.2f}\t\t{calc_micro_sec(di):.2f}")
+    print(f"Pydantic DI test\t{pydantic_di:.2f}\t\t{calc_micro_sec(pydantic_di):.2f}")
+    print(f"Manual test\t\t{manual:.2f}\t\t{calc_micro_sec(manual):.2f}")
+    print(f"Pydantic Manual test\t{pydantic_manual:.2f}\t\t{calc_micro_sec(pydantic_manual):.2f}")
+
+def calc_micro_sec(value: float) -> float:
+    return (value / execution_count) * 1_000_000
 
 class OtherResponse:
     def __init__(self, test: int, body: str):
