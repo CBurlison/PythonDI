@@ -1,6 +1,7 @@
 import inspect
 from enum import Enum
 from pydantic import BaseModel
+import typing
 
 class UnregisteredAction(Enum):
     NONE = 0
@@ -16,16 +17,17 @@ class TypeConstructor:
             self.is_pydantic: bool = True
             constructor.pop("return")
         else:
-            self.is_pydantic: bool = False
+            self.is_pydantic = False
 
         self.constructor: dict[str, type] = constructor
         self.keys: list[str] = list(constructor.keys())
 
-class UnregisteredType(Exception): pass
+class UnregisteredType(Exception): 
+    pass
 
 class DIContainer:
     __type_constructors: dict[type, TypeConstructor] = {}
-    __type_instances: dict[type, any] = {}
+    __type_instances: dict[type, typing.Any] = {}
 
     def __init__(self, unregistered_action: UnregisteredAction = UnregisteredAction.DEFAULT):
         if unregistered_action == UnregisteredAction.DEFAULT:
@@ -39,7 +41,7 @@ class DIContainer:
 
     # register an object type for future construction
     def register(self, object_type: type):
-        constructor: dict[str, any]
+        constructor: dict[str, typing.Any]
         try:
             constructor = inspect.getfullargspec(object_type).annotations
         except(TypeError):
@@ -53,7 +55,7 @@ class DIContainer:
         self.__type_instances[object_type] = instance
 
     # locate existing instance or construct new object
-    def locate(self, object_type: type, params=[]) -> any:
+    def locate(self, object_type: type, params=[]) -> typing.Any:
         # locate registered instance/singleton
         if object_type in self.__type_instances:
             value = self.__type_instances[object_type]
@@ -68,8 +70,8 @@ class DIContainer:
             return self.__inner_locate(object_type, params)
 
     # locate all objects associated with the given object_type
-    def locate_all(self, object_type: type, params=[]) -> list[any]:
-        all: list[any] = []
+    def locate_all(self, object_type: type, params=[]) -> list[typing.Any]:
+        all: list[typing.Any] = []
 
         for item in self.__type_constructors.values():
             if issubclass(item.base_type, object_type):
@@ -78,7 +80,7 @@ class DIContainer:
         return all
 
     # private: construct a new object
-    def __inner_locate(self, object_type: type, params=[]) -> any:
+    def __inner_locate(self, object_type: type, params=[]) -> typing.Any:
         if object_type not in self.__type_constructors:
             return self.__unregistered_action(object_type, params)
                
@@ -90,7 +92,7 @@ class DIContainer:
         return self.__construct_type(di_constructor, object_type, params)
     
     def __construct_type(self, di_constructor: TypeConstructor, object_type: type, params=[]):
-        args: list[any] = []
+        args: list[typing.Any] = []
         params_len = len(params)
 
         for i in range(len(di_constructor.constructor)):
@@ -116,15 +118,15 @@ class DIContainer:
 
         return obj
     
-    def __unregistered_default(self, object_type: type, params: list[any]):
+    def __unregistered_default(self, object_type: type, params: list[typing.Any]):
         return object_type()
     
-    def __unregistered_none(self, object_type: type, params: list[any]):
+    def __unregistered_none(self, object_type: type, params: list[typing.Any]):
         return None
     
-    def __unregistered_exception(self, object_type: type, params: list[any]):
+    def __unregistered_exception(self, object_type: type, params: list[typing.Any]):
         raise UnregisteredType(f"{object_type} not registered with DIContainer.")
     
-    def __unregistered_register(self, object_type: type, params: list[any]):
+    def __unregistered_register(self, object_type: type, params: list[typing.Any]):
         self.register(object_type)
         return self.__inner_locate(object_type, params)

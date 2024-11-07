@@ -1,4 +1,4 @@
-from PythonDI import *
+from PythonDI import DIContainer, UnregisteredAction, UnregisteredType
 import pytest
 from pydantic import BaseModel
 
@@ -86,7 +86,7 @@ def test_locate_dependencies_mixed():
     di.register(PydanticHelloResponse)
     di.register(MixedResponse)
 
-    response: MixedResponse = di.locate(MixedResponse, [])
+    response: MixedResponse = di.locate(MixedResponse)
     assert response is not None # HelloResponse located
     assert response.hello is not None
     assert response.hello.body == "" # body populated with default value for str
@@ -164,7 +164,7 @@ def test_locate_dependencies_required_defaults():
     di = DIContainer()
     di.register(RequiredHelloResponse)
 
-    with pytest.raises(TypeError) as ex:
+    with pytest.raises(TypeError):
         _ = di.locate(RequiredHelloResponse, [])
 
 class OtherResponse:
@@ -206,10 +206,14 @@ class RequiredHelloResponse:
         self.body = body
         self.goodbye = goodbye
   
-class A: pass
+class A: 
+    pass
 
-class B(A): pass
+class B(A): 
+    pass
 
-class C(B): pass
+class C(B): 
+    pass
 
-class D(A): pass
+class D(A): 
+    pass

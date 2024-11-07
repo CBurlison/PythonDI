@@ -1,5 +1,5 @@
 import timeit
-from PythonDI import *
+from PythonDI import DIContainer
 from pydantic import BaseModel
 
 #execution_count = 100_000_000
@@ -89,13 +89,17 @@ class PydanticHelloResponse(BaseModel):
     body: str = ""
     goodbye: PydanticGoodbyeResponse = None
     
-class A: pass
+class A: 
+    pass
 
-class B(A): pass
+class B(A): 
+    pass
 
-class C(B): pass
+class C(B): 
+    pass
 
-class D(A): pass
+class D(A): 
+    pass
 
 if __name__ == "__main__":
     main()
