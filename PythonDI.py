@@ -9,22 +9,17 @@ class UnregisteredAction(Enum):
     REGISTER = 3
 
 class TypeConstructor:
-    base_type: type = None
-    constructor: dict[str, type] = None
-    keys: list[str] = None
-    classes: tuple[type, ...] = None
-    is_pydantic: bool = False
-    
     def __init__(self, object_type: type, constructor: dict[str, type]):
-        self.base_type = object_type
-        self.classes = inspect.getmro(object_type)
+        self.base_type: type = object_type
 
-        if BaseModel in self.classes and "return" in constructor:
-            self.is_pydantic = True
+        if issubclass(object_type, BaseModel) and "return" in constructor:
+            self.is_pydantic: bool = True
             constructor.pop("return")
+        else:
+            self.is_pydantic: bool = False
 
-        self.constructor = constructor
-        self.keys = list(constructor.keys())
+        self.constructor: dict[str, type] = constructor
+        self.keys: list[str] = list(constructor.keys())
 
 class UnregisteredType(Exception): pass
 
@@ -77,7 +72,7 @@ class DIContainer:
         all: list[any] = []
 
         for item in self.__type_constructors.values():
-            if object_type in item.classes:
+            if issubclass(item.base_type, object_type):
                 all.append(self.locate(item.base_type, params))
 
         return all

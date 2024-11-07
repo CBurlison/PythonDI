@@ -31,6 +31,16 @@ def perf_test_manual_pydantic():
     for _ in range(execution_count):
         _ = PydanticHelloResponse(body="Hello", goodbye=PydanticGoodbyeResponse(test=PydanticOtherResponse(test=0, body="")))
 
+def perf_test_di_locate_all():
+    di = DIContainer()
+    di.register(A)
+    di.register(B)
+    di.register(C)
+    di.register(D)
+    
+    for _ in range(execution_count):
+        _ = di.locate_all(B)
+
 def main():
     print("Running performance tests.")
     print("Now running: DI test")
@@ -41,12 +51,15 @@ def main():
     manual = timeit.timeit(stmt=perf_test_manual, number=1)
     print("Now running: Pydantic Manual test")
     pydantic_manual = timeit.timeit(stmt=perf_test_manual_pydantic, number=1)
+    print("Now running: Locate All test")
+    locate_all = timeit.timeit(stmt=perf_test_di_locate_all, number=1)
 
     print("\nResults\nTest\t\t\tRuntime (sec)\tAverage (μs)")
     print(f"DI test\t\t\t{di:.2f}\t\t{calc_micro_sec(di):.2f}")
     print(f"Pydantic DI test\t{pydantic_di:.2f}\t\t{calc_micro_sec(pydantic_di):.2f}")
     print(f"Manual test\t\t{manual:.2f}\t\t{calc_micro_sec(manual):.2f}")
     print(f"Pydantic Manual test\t{pydantic_manual:.2f}\t\t{calc_micro_sec(pydantic_manual):.2f}")
+    print(f"Locate All test\t\t{locate_all:.2f}\t\t{calc_micro_sec(locate_all):.2f}")
 
 def calc_micro_sec(value: float) -> float:
     return (value / execution_count) * 1_000_000
@@ -75,6 +88,14 @@ class PydanticGoodbyeResponse(BaseModel):
 class PydanticHelloResponse(BaseModel):
     body: str = ""
     goodbye: PydanticGoodbyeResponse = None
+    
+class A: pass
+
+class B(A): pass
+
+class C(B): pass
+
+class D(A): pass
 
 if __name__ == "__main__":
     main()
