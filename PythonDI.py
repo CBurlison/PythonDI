@@ -26,10 +26,10 @@ class UnregisteredType(Exception):
     pass
 
 class DIContainer:
-    __type_constructors: dict[type, TypeConstructor] = {}
-    __type_instances: dict[type, typing.Any] = {}
-
     def __init__(self, unregistered_action: UnregisteredAction = UnregisteredAction.DEFAULT):
+        self.__type_constructors: dict[type, TypeConstructor] = {}
+        self.__type_instances: dict[type, typing.Any] = {}
+
         if unregistered_action == UnregisteredAction.DEFAULT:
             self.__unregistered_action = self.__unregistered_default
         elif unregistered_action == UnregisteredAction.NONE:
@@ -42,6 +42,7 @@ class DIContainer:
     # register an object type for future construction
     def register(self, object_type: type):
         constructor: dict[str, typing.Any]
+        
         try:
             constructor = inspect.getfullargspec(object_type).annotations
         except(TypeError):
