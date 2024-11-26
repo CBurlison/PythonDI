@@ -16,6 +16,12 @@ def test_locate():
     assert response.goodbye is not None # GoodbyeResponse not registered. default value used
     assert response.goodbye.test is None # TestResponse not located because GoodbyeResponse was default. test never populated
 
+    response.body = "test"
+
+    response2 = di.locate(HelloResponse, [])
+    assert response != response2
+    assert response.body != response2.body
+
 def test_locate_unregistered_none():
     di = DIContainer(UnregisteredAction.NONE)
     di.register(HelloResponse)

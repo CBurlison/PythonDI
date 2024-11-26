@@ -102,9 +102,9 @@ To those whom it may concern, I have added performance tests which compare runni
 ```
 Results
 Test                    Runtime (sec)   Average (μs)
-DI test                 22.10           2.21
-Pydantic DI test        146.79          14.68
-Manual test             7.03            0.70
-Pydantic Manual test    28.83           2.88
-Locate All test         14.09           1.41
+DI test                 2.12            2.12
+Pydantic DI test        4.69            4.69
+Manual test             0.53            0.53
+Pydantic Manual test    2.90            2.90
+Locate All test         1.12            1.12
 ```

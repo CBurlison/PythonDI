@@ -4,6 +4,7 @@ from pydantic import BaseModel
 
 #execution_count = 100_000_000
 execution_count = 10_000_000
+execution_count = 1_000_000
 
 def perf_test_di():
     di = DIContainer()
@@ -25,11 +26,11 @@ def perf_test_di_pydantic():
 
 def perf_test_manual():
     for _ in range(execution_count):
-        _ = HelloResponse(body="Hello", goodbye=GoodbyeResponse(test=OtherResponse(test=0, body="")))
+        _ = HelloResponse(*["Hello", GoodbyeResponse(*[OtherResponse(*[0, ""])])])
 
 def perf_test_manual_pydantic():
     for _ in range(execution_count):
-        _ = PydanticHelloResponse(body="Hello", goodbye=PydanticGoodbyeResponse(test=PydanticOtherResponse(test=0, body="")))
+        _ = PydanticHelloResponse(**{"body": "Hello", "goodbye":PydanticGoodbyeResponse(**{"test":PydanticOtherResponse(**{"test":0, "body":""})})})
 
 def perf_test_di_locate_all():
     di = DIContainer()

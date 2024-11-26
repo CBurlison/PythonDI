@@ -106,18 +106,19 @@ class DIContainer:
         return object_type(*args)
     
     def __construct_base_model(self, di_constructor: TypeConstructor, object_type: type, params=[]):
-        obj = object_type()
         params_len = len(params)
+
+        args: dict[str, typing.Any] = {}
 
         for i in range(len(di_constructor.constructor)):
             key = di_constructor.keys[i]
 
             if (i < params_len):
-                setattr(obj, key, params[i])
+                args[key] = params[i]
             else:
-                setattr(obj, key, self.locate(di_constructor.constructor[key]))
+                args[key] = self.locate(di_constructor.constructor[key])
 
-        return obj
+        return object_type(**args)
     
     def __unregistered_default(self, object_type: type, params: list[typing.Any]):
         return object_type()
