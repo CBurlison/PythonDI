@@ -4,7 +4,6 @@ from pydantic import BaseModel
 
 #execution_count = 100_000_000
 execution_count = 10_000_000
-execution_count = 1_000_000
 
 def perf_test_di():
     di = DIContainer()
