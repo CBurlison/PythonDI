@@ -41,6 +41,7 @@ class DIContainer:
 
     # register an object type for future construction
     def register(self, object_type: type):
+        """register an object type for future construction"""
         constructor: dict[str, typing.Any]
         
         try:
@@ -50,13 +51,13 @@ class DIContainer:
 
         self.__type_constructors[object_type] = TypeConstructor(object_type, constructor)
         
-    # register an object type instance
     def register_instance(self, object_type: type, instance=None):
+        """register an object type instance"""
         self.register(object_type)
         self.__type_instances[object_type] = instance
 
-    # locate existing instance or construct new object
     def locate(self, object_type: type, params=[]) -> typing.Any:
+        """locate existing instance or construct new object"""
         # locate registered instance/singleton
         if object_type in self.__type_instances:
             value = self.__type_instances[object_type]
@@ -70,8 +71,8 @@ class DIContainer:
         else:
             return self.__inner_locate(object_type, params)
 
-    # locate all objects associated with the given object_type
     def locate_all(self, object_type: type, params=[]) -> list[typing.Any]:
+        """locate all objects associated with the given object_type"""
         all: list[typing.Any] = []
 
         for item in self.__type_constructors.values():
@@ -80,8 +81,8 @@ class DIContainer:
 
         return all
 
-    # private: construct a new object
     def __inner_locate(self, object_type: type, params=[]) -> typing.Any:
+        """private: construct a new object"""
         if object_type not in self.__type_constructors:
             return self.__unregistered_action(object_type, params)
                
