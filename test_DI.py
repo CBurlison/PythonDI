@@ -117,6 +117,20 @@ def test_locate_with_param():
     assert response is not None # HelloResponse located
     assert response.body == "Hello" # body param applies
 
+def test_locate_dependencies_with_param():
+    di = DIContainer()
+    di.register(OtherResponse)
+    di.register(GoodbyeResponse)
+    di.register(HelloResponse)
+
+    response = di.locate(HelloResponse, ["Hello"])
+    assert response is not None # HelloResponse located
+    assert response.body == "Hello" # body populated with default value for str
+    assert response.goodbye is not None # GoodbyeResponse located
+    assert response.goodbye.test is not None # TestResponse located
+    assert response.goodbye.test.test == 0 # TestResponse.test populated with default value for int
+    assert response.goodbye.test.body == "" # TestResponse.body populated with default value for str
+
 def test_locate_with_param_pydantic():
     di = DIContainer()
     di.register(PydanticHelloResponse)
@@ -124,6 +138,20 @@ def test_locate_with_param_pydantic():
     response = di.locate(PydanticHelloResponse, ["Hello"])
     assert response is not None # HelloResponse located
     assert response.body == "Hello" # body param applies
+
+def test_locate_pydantic_dependencies_with_param():
+    di = DIContainer()
+    di.register(PydanticOtherResponse)
+    di.register(PydanticGoodbyeResponse)
+    di.register(PydanticHelloResponse)
+
+    response = di.locate(PydanticHelloResponse, ["Hello"])
+    assert response is not None # HelloResponse located
+    assert response.body == "Hello" # body populated with default value for str
+    assert response.goodbye is not None # GoodbyeResponse located
+    assert response.goodbye.test is not None # TestResponse located
+    assert response.goodbye.test.test == 0 # TestResponse.test populated with default value for int
+    assert response.goodbye.test.body == "" # TestResponse.body populated with default value for str
 
 def test_register_instance():
     di = DIContainer()
